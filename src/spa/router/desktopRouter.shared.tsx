@@ -50,6 +50,7 @@ import {
   projectAcceptanceRouteMeta,
   projectConversationRouteMeta,
   projectDirectoriesRouteMeta,
+  projectHomeRouteMeta,
   projectsRouteMeta,
 } from '@/features/Projects/routeMeta';
 import ResourceCategorySkeleton from '@/features/ResourceHome/Skeleton';
@@ -1066,7 +1067,12 @@ export const sharedMainAreaChildren: RouteObject[] = [
   {
     children: [
       {
-        element: redirectElement('conversation'),
+        element: dynamicElement(
+          () => import('@/routes/(main)/project/[projectId]'),
+          'Desktop > Project Home',
+          { preloadId: 'project-home' },
+        ),
+        handle: { meta: projectHomeRouteMeta },
         index: true,
       },
       {
