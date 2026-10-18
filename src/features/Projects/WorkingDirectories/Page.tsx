@@ -11,6 +11,8 @@ import { useCurrentProjectDetail, useProjectStore } from '@/store/project';
 import { useUserStore } from '@/store/user';
 import { userProfileSelectors } from '@/store/user/selectors';
 
+import { ProjectKnowledgeBaseSettings } from '../KnowledgeBases';
+import { ProjectMemberSettings } from '../Members';
 import { AdvancedSettings } from './AdvancedSettings';
 import { GeneralSettings } from './GeneralSettings';
 import { ProjectWorkingDirectories } from './index';
@@ -39,6 +41,16 @@ export function ProjectDirectoriesPage() {
       key: 'general',
       label: t('settings.general'),
       render: () => <GeneralSettings key={detail.project.id} project={detail.project} />,
+    },
+    {
+      key: 'members',
+      label: t('settings.members'),
+      render: () => <ProjectMemberSettings detail={detail} />,
+    },
+    {
+      key: 'knowledge',
+      label: t('settings.knowledgeBases'),
+      render: () => <ProjectKnowledgeBaseSettings detail={detail} />,
     },
     {
       key: 'environments',
