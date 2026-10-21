@@ -17,6 +17,7 @@ import {
   TopicListScopeContext,
 } from '@/features/AgentSidebar/Topic/TopicListScope';
 import SkeletonList from '@/features/NavPanel/components/SkeletonList';
+import { useWorkspacePreferenceReady } from '@/hooks/useWorkspacePreferenceReady';
 import {
   useProjectDirectories,
   useProjectDirectoryStore,
@@ -54,6 +55,10 @@ function ProjectTopicList({
   const directoriesRequest = useProjectDirectoryStore((s) => s.useFetchDirectories)(projectId);
   const topics = useProjectTopics(projectId);
   const directories = useProjectDirectories(projectId);
+  // The rows are filtered client-side by the workspace "only mine" choice, and
+  // nothing else on a project route syncs that preference. Hold the list until
+  // it is known so the unfiltered rows never paint.
+  const isPreferenceLoading = !useWorkspacePreferenceReady();
   return (
     <Flexbox gap={1} paddingBlock={12}>
       <Flexbox horizontal align="center" justify="space-between" paddingInline={8}>
@@ -86,12 +91,12 @@ function ProjectTopicList({
           onRetry={() => Promise.all([request.revalidate(), directoriesRequest.revalidate()])}
         />
       ) : null}
-      {!request.hasData ? (
+      {!request.hasData || isPreferenceLoading ? (
         <SkeletonList />
       ) : !topics.length && !request.error ? (
         <Text type="secondary">{t('directories.noConversations')}</Text>
       ) : null}
-      {topicGroupMode === 'flat' ? (
+      {isPreferenceLoading ? null : topicGroupMode === 'flat' ? (
         <FlatMode />
       ) : topicGroupMode === 'byStatus' ? (
         <ByStatusMode />
