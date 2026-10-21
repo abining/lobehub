@@ -16,6 +16,7 @@ import {
   TopicListRevealContext,
   TopicListScopeContext,
 } from '@/features/AgentSidebar/Topic/TopicListScope';
+import { useOnlyMineTopics } from '@/features/AgentSidebar/Topic/useScopedTopics';
 import SkeletonList from '@/features/NavPanel/components/SkeletonList';
 import { useWorkspacePreferenceReady } from '@/hooks/useWorkspacePreferenceReady';
 import {
@@ -53,7 +54,8 @@ function ProjectTopicList({
   const { topicGroupMode } = useAgentTopicGroupMode();
   const request = useProjectDirectoryStore((s) => s.useFetchProjectTopics)(projectId);
   const directoriesRequest = useProjectDirectoryStore((s) => s.useFetchDirectories)(projectId);
-  const topics = useProjectTopics(projectId);
+  // The empty state must follow what the list shows, "only mine" included.
+  const topics = useOnlyMineTopics(useProjectTopics(projectId));
   const directories = useProjectDirectories(projectId);
   // The rows are filtered client-side by the workspace "only mine" choice, and
   // nothing else on a project route syncs that preference. Hold the list until

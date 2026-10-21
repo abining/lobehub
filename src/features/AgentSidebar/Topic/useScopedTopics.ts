@@ -51,6 +51,19 @@ export const pinCoordinatorGroup = (groups: GroupedTopic[], coordinatorAgentId?:
 export const useScopedTopic = (id?: string) =>
   useScopedTopics().topics?.find((topic) => topic.id === id);
 
+/**
+ * Project topics arrive in full, so the workspace "only mine" filter applies on
+ * the client: keep only the caller's rows when it is on.
+ */
+export const useOnlyMineTopics = <T extends { userId?: string | null }>(topics: T[]): T[] => {
+  const onlyMine = useTopicOnlyMine();
+  const userId = useUserStore(userProfileSelectors.userId);
+  return useMemo(
+    () => (onlyMine ? topics.filter((topic) => topic.userId === userId) : topics),
+    [topics, onlyMine, userId],
+  );
+};
+
 export const useScopedSidebarTopics = (
   pageSize: number,
   sortBy: TopicSortBy,
@@ -65,10 +78,6 @@ export const useScopedSidebarTopics = (
   const visibleLimit = pageSize + (reveal?.extraRows ?? 0);
   const running = useChatStore(operationSelectors.visiblyRunningTopicIds);
   const directories = useProjectDirectories(scope?.projectId);
-  const onlyMine = useTopicOnlyMine();
-  const userId = useUserStore(userProfileSelectors.userId);
-  // Project topics arrive in full, so the "only mine" filter applies here
-  // instead of on the server.
   const sidebarTopics = useMemo(
     () =>
       (topics ?? []).filter(
@@ -77,10 +86,7 @@ export const useScopedSidebarTopics = (
       ),
     [topics],
   );
-  const listed = useMemo(
-    () => (onlyMine ? sidebarTopics.filter((topic) => topic.userId === userId) : sidebarTopics),
-    [sidebarTopics, onlyMine, userId],
-  );
+  const listed = useOnlyMineTopics(sidebarTopics);
   const visible = useMemo(
     () =>
       selectSidebarTopics(
