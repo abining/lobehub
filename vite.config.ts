@@ -125,7 +125,7 @@ export default defineConfig({
             __dirname,
             isAuth ? 'index.auth.html' : isMobile ? 'index.mobile.html' : 'index.html',
           ),
-          ...(!isAuth && canvasRuntimeEntries),
+          ...(!isAuth && !isMobile && canvasRuntimeEntries),
         },
         strictExecutionOrder: true,
       }),
